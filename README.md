@@ -35,7 +35,7 @@ pip install pandas numpy
 (기본 라이브러리 collections, itertools, sys는 별도 설치 불필요.)
 
 ## 사용법
-1. **CSV 파일 준비**: 로또 데이터 CSV 파일(예: "로또회차별당첨번호-20250816.csv")을 다운로드하거나 생성하세요. 컬럼: 회차, 추첨일, 첫번째~여섯번째 (본번호), 보너스 등.
+1. **CSV 파일 준비**: 로또 데이터 CSV 파일(예: "lotto_data-20250816.csv")을 다운로드하거나 생성하세요. 컬럼: 회차, 추첨일, 첫번째 ~ 여섯번째 (본번호), 보너스 등.
 2. **스크립트 실행**: 명령줄에서 파일 경로를 인수로 전달.
    ```
    python lotto_recommender.py <csv_file_path>

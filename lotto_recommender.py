@@ -3,6 +3,7 @@ from collections import Counter
 import itertools
 import numpy as np
 import sys
+import random  # 랜덤성 추가
 
 def load_lotto_data(file_path):
     """CSV 파일 로드 및 데이터 검증"""
@@ -86,15 +87,27 @@ def generate_recommendations(full_freq, recent_freq, past_combs, sum_p25, sum_p7
             score = sum(full_freq.get(n, 0) for n in sorted_comb) + 0.5 * sum(recent_freq.get(n, 0) for n in sorted_comb)
             filtered_combs.append((sorted_comb, score))
     
-    # 점수 내림차순 정렬 및 상위 5개 선택
+    # 점수 내림차순 정렬
     filtered_combs.sort(key=lambda x: x[1], reverse=True)
-    recommendations = [comb for comb, _ in filtered_combs[:5]]
     
-    # 부족 시 조건 완화 (합계 범위 확대)
+    # 상위 10개 풀 선정 (최고 가능성)
+    top_pool_size = 10
+    if len(filtered_combs) >= top_pool_size:
+        top_candidates = filtered_combs[:top_pool_size]
+    else:
+        top_candidates = filtered_combs
+    
+    # 풀 내 랜덤 shuffle 후 5개 선택
+    random.shuffle(top_candidates)
+    selected = top_candidates[:5]
+    recommendations = [comb for comb, _ in selected]
+    
+    # 부족 시 조건 완화 (합계 범위 확대) + 상위 10개 풀 적용
     if len(recommendations) < 5:
         print("필터링된 조합 부족: 합계 범위 완화하여 재시도")
         extended_min = sum_p25 - 20
         extended_max = sum_p75 + 20
+        extended_filtered = []
         for comb in all_combs:
             sorted_comb = sorted(comb)
             comb_sum = sum(sorted_comb)
@@ -107,9 +120,15 @@ def generate_recommendations(full_freq, recent_freq, past_combs, sum_p25, sum_p7
                 frozenset(sorted_comb) not in past_combs
             ):
                 score = sum(full_freq.get(n, 0) for n in sorted_comb) + 0.5 * sum(recent_freq.get(n, 0) for n in sorted_comb)
-                filtered_combs.append((sorted_comb, score))
-        filtered_combs.sort(key=lambda x: x[1], reverse=True)
-        recommendations = [comb for comb, _ in filtered_combs[:5]]
+                extended_filtered.append((sorted_comb, score))
+        extended_filtered.sort(key=lambda x: x[1], reverse=True)
+        if len(extended_filtered) >= top_pool_size:
+            top_candidates = extended_filtered[:top_pool_size]
+        else:
+            top_candidates = extended_filtered
+        random.shuffle(top_candidates)
+        selected = top_candidates[:5]
+        recommendations = [comb for comb, _ in selected]
     
     return recommendations
 
@@ -129,20 +148,20 @@ def main():
     odd_ratio, sum_mean, sum_p25, sum_p75, avg_consec = analyze_statistics(numbers_df)
     past_combs = get_past_combinations(numbers_df)
     
-    # 분석 결과 출력
+    # 분석 결과 출력 (np.int64 변환)
     print("=== 로또 데이터 분석 결과 ===")
     print(f"총 회차 수: {len(df)}")
-    print(f"전체 번호 빈도 상위 10: {full_freq.most_common(10)}")
-    print(f"최근 50회 빈도 상위 10: {recent_freq.most_common(10)}")
+    print(f"전체 번호 빈도 상위 10: {[(int(num), count) for num, count in full_freq.most_common(10)]}")
+    print(f"최근 50회 빈도 상위 10: {[(int(num), count) for num, count in recent_freq.most_common(10)]}")
     print(f"홀수 비율: {odd_ratio:.2%}")
     print(f"합계 평균: {sum_mean:.1f}, 25%~75% 범위: {sum_p25}~{sum_p75}")
     print(f"평균 연속 쌍 수: {avg_consec:.2f}")
     
-    # 추천
+    # 추천 (np.int64 변환)
     recommendations = generate_recommendations(full_freq, recent_freq, past_combs, sum_p25, sum_p75, avg_consec)
     print("\n=== 추천 번호 조합 (당첨 가능성 높은 5개) ===")
     for i, comb in enumerate(recommendations, 1):
-        print(f"{i}. {comb}")
+        print(f"{i}. {[int(n) for n in comb]}")
 
 if __name__ == "__main__":
     main()

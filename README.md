@@ -36,14 +36,14 @@ pip install pandas numpy
 (기본 라이브러리 collections, itertools, sys, random은 별도 설치 불필요.)
 
 ## 사용법
-1. **CSV 파일 준비**: 로또 데이터 CSV 파일(예: "lotto_data-20250816.csv")을 다운로드하거나 생성하세요. 컬럼: 회차, 추첨일, 첫번째 ~ 여섯번째 (본번호), 보너스 등.
+1. **CSV 파일 준비**: 로또 데이터 CSV 파일(예: "lotto_data.csv")을 다운로드하거나 생성하세요. 컬럼: 회차, 추첨일, 첫번째 ~ 여섯번째 (본번호), 보너스 등.
 2. **스크립트 실행**: 명령줄에서 파일 경로를 인수로 전달.
    ```
-   python lotto_recommender.py <csv_file_path>
+   python3 lotto_recommender.py <csv_file_path>
    ```
    예시:
    ```
-   python lotto_recommender.py lotto_data.csv
+   python3 lotto_recommender.py lotto_data.csv
    ```
 3. **출력 예시**:
    ```
@@ -66,7 +66,7 @@ pip install pandas numpy
 - **analyze_frequencies()**: 전체/최근 빈도 Counter 생성.
 - **analyze_statistics()**: 홀/짝 비율, 합계 통계(numpy 사용), 연속 쌍 평균 계산.
 - **get_past_combinations()**: 과거 조합 set 저장 (frozenset으로 중복 방지).
-- **generate_recommendations()**: 후보 풀 생성, 조합 필터링/점수화, 상위 10개 풀 선정 후 랜덤 5개 추천. 조건 부족 시 범위 완화 로직 포함.
+- **generate_recommendations()**: 후보 풀 생성, 조합 필터링/점수화, 상위 5개 선정 후 추천. 조건 부족 시 범위 완화 로직 포함.
 - **main()**: 전체 실행 흐름, 분석 결과 출력.
 
 코드의 정교함: 
